@@ -1,1 +1,0 @@
-cmd_/home/yong2/SimpleRootkit/rootkit_yong.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/yong2/SimpleRootkit/rootkit_yong.ko /home/yong2/SimpleRootkit/rootkit_yong.o /home/yong2/SimpleRootkit/rootkit_yong.mod.o;  true

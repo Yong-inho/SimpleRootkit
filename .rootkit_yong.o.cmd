@@ -1,1 +1,0 @@
-cmd_/home/yong2/SimpleRootkit/rootkit_yong.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /home/yong2/SimpleRootkit/rootkit_yong.o /home/yong2/SimpleRootkit/core.o /home/yong2/SimpleRootkit/module.o /home/yong2/SimpleRootkit/proc.o /home/yong2/SimpleRootkit/file.o

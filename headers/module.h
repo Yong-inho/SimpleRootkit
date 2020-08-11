@@ -1,1 +1,1 @@
-void hide_module(int flag);
+void toggle_module_visible(int flag);

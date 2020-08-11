@@ -236,3 +236,12 @@ unsigned long unhide_file_all(void) {
 
 	return 0;
 }
+
+/*
+void toggle_file_visible(const char* filePath, int flag) {
+	if(flag == 1)
+		hide_file(filePath);
+	else
+		unhide_file_all();
+}
+*/

